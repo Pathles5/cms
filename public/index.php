@@ -79,7 +79,7 @@ switch($numero){
                 controlador()->acercade();
                 break;
             case "noticias":
-                controlador()->$array_ruta[0]();
+                controlador()->noticias();
                 break;
             case "panel":
                 controlador("usuarios")->entrar();

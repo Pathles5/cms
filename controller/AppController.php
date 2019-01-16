@@ -6,31 +6,51 @@
  * Time: 19:31
  */
 namespace App\Controller;
+use App\Helper\ViewHelper;
+use App\Helper\DbHelper;
 
 class AppController
 {
 
+    var $view;
+    var $db;
+
+    var $carpeta = "app";
+
+    function __construct()
+    {
+        $viewHelper = new ViewHelper();
+        $this->view = $viewHelper;
+
+        $dbHelper = new DbHelper();
+        $this->db = $dbHelper;
+    }
+
     public function index(){
 
-        echo "Esto es la home";
+        $datos = "Atnonio";
+        $this->view->vistas($this->carpeta,"index", $datos);
 
     }
 
     public function acercade(){
 
-        echo "Esto es acerca de";
-
+        $this->view->vistas($this->carpeta,"acerca-de");
     }
 
     public function noticias(){
 
-        echo "Esto es noticias";
+        $this->view->vistas($this->carpeta,"noticias");
 
     }
 
     public function noticia($slug){
 
-        echo "Esta es la noticia: ".$slug;
+        $this->view->vistas($this->carpeta,"noticia");
 
     }
+
+
+
+
 }

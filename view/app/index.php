@@ -1,7 +1,3 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: web
- * Date: 11/01/2019
- * Time: 19:40
- */
+echo "Esto es la home<br> y tu eres $datos<br>";
+?>
