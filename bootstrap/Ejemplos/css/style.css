@@ -1,0 +1,16 @@
+html {
+    max-width: 100%;
+}
+.container{
+    background: aquamarine;
+}
+.container-fluid{
+    background: blueviolet;
+}
+.col, .col-3{
+    border: 1px solid #000000;
+}
+.col-3{
+    background: chocolate;
+    text-align: center;
+}

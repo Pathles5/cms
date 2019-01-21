@@ -1,0 +1,26 @@
+    Crea un sitio web utilizamdo bootstrap con los siguientes caracteristicas:
+    -El ancho máximo será 1440px y el contenido estará centrado si la pantalla es mas ancha
+    -En pantallas muy grandes:
+        > El header debe de tener una imagen a la izq que ocupe el 25% y un titulo centrado en el 75% restante.
+        > Una Section con 12 articles debe mostrar 4 por fila.
+        > Cada article llevará una imagen a la izq ocupando el 25% y un titulo con un parrafo debajo en el 75% restante.
+        > Un footer sencillo
+        NOTA: Poner bordes a todos los elementos.
+
+    -En pantallas grandes:
+
+        > La imagen del header pasa al 33.33% y el titulo al 66.67%
+        > La section muestra 3 articles/fila.
+
+    - En pantallas medianas:
+
+        > La section muestra 2 articles por fila
+        > En cada article, la imagen ocupa 50% y titulo y parrafo 50%
+
+    - En pantallas peq:
+        > El header miestra la imagen encima ocupando un 33.33% pero centrada y el titulo el 100% debajo
+        > 1Article/fila
+        > Cada article muestra la imafen debajo, el titulo y el parrafo debajo.
+        EXTRA: Cada article muestra el titulo encima, despeus imagen y seguido parrafo.
+
+    Limitaciones: Solo css para el max de la pag  y las imagenes.
