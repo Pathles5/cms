@@ -1,0 +1,44 @@
+html{
+    max-width: 1400px;
+    text-align: center;
+    margin: 1em auto;
+}
+
+table {
+    text-align: center;
+
+}
+tr:first-child {
+    text-align: left;
+
+}
+
+.container-fluid {
+    min-height: 600px;
+}
+a:hover {
+    text-decoration: none;
+}
+
+.rojo,
+.verde:hover {
+    color: #8b0000;
+
+}
+
+.verde,
+.rojo:hover{
+    color: #0c7927;
+}
+
+/*Listados*/
+.cabecera_listdo{
+    margin: 3em 0 0 0;
+    font-weight: 400;
+    border-bottom: 1px solid #000000;
+}
+.item_listado{
+    padding: 0.3em 0 0.3em 0;
+    border-bottom: 1px solid #aaaaaa;
+}
+

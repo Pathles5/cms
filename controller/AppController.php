@@ -15,7 +15,6 @@ class AppController
     var $view;
     var $db;
 
-    var $carpeta = "app";
 
     function __construct()
     {
@@ -23,13 +22,12 @@ class AppController
         $this->view = $viewHelper;
 
         $dbHelper = new DbHelper();
-        $this->db = $dbHelper;
+        $this->db = $dbHelper->db;
     }
 
     public function index(){
 
-        $datos = "Atnonio";
-        $this->view->vistas($this->carpeta,"index", $datos);
+        $this->view->vistas("app","index", "Antonio");
 
     }
 

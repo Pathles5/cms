@@ -7,27 +7,238 @@
  */
 namespace App\Controller;
 
+use App\Helper\ViewHelper;
+use App\Helper\DbHelper;
+use App\Model\Usuario;
+
 class UsuarioController
 {
+    var $view;
+    var $db;
 
-    public function index(){
+    function __construct()
+    {
+        $viewHelper = new ViewHelper();
+        $this->view = $viewHelper;
 
-        echo"Esto es el inex";
+        $dbHelper = new DbHelper();
+        $this->db = $dbHelper->db;
+    }
+
+    //Le llevo a la página de inicio de panel
+    public function inicio(){
+
+        $this->view->vistas("panel","index");
 
     }
 
-    public function crear(){}
+    //Listado de usuarios
+    function index(){
+
+        //Recojo los usuarios de la bbdd
+        $datos = $this->db->query("SELECT * FROM usuarios");
+
+        $this->view->vistas("panel","usuarios/index", $datos);
+
+    }
+
+    public function crear(){
+
+        //Creo un nuevo usuario vacio
+        $usuario = new Usuario();
+
+        //Llamar a la ventana editar
+        $this->view->vistas("panel","usuarios/editar", $usuario);
+
+    }
 
     public function editar($id){
 
+        if (isset($_POST["usuario"])){
+
+            //Recupero datos del formulario, de manera segura
+            $usuario = filter_input(INPUT_POST, "usuario", FILTER_SANITIZE_STRING );
+            $clave = filter_input(INPUT_POST, "clave", FILTER_SANITIZE_STRING );
+            $noticias = (filter_input(INPUT_POST, "noticias", FILTER_SANITIZE_NUMBER_INT ) == "on") ? 1 : 0;
+            $usuarios = (filter_input(INPUT_POST, "usuarios", FILTER_SANITIZE_NUMBER_INT ) == "on") ? 1 : 0;
+
+            //Encripto la clave
+            $clave_encriptada=crypt($clave);
+
+            if ($id == "nuevo") {
+
+                //Creo nuevo user
+                $consulta = $this->db->exec("INSERT INTO usuarios (usuario, clave, noticias, usuarios) VALUES ('$usuario','$clave_encriptada','$noticias','$usuarios')");
+
+                //Se crea correctamente
+                if ( $consulta > 0) {
+
+                    //Mensaje y redireccion
+                    $mensajes=array(
+                        array(
+                            "tipo" => "success",
+                            "mensaje" => "Usuario: <strong>$usuario</strong> se ha registrado."
+                        )
+                    );
+                    $_SESSION["mensajes"] = $mensajes;
+                    header("Location:".$_SESSION["home"]."panel/usuarios");
+
+                //Hubo algun error
+                }else {
+
+                    //Mensaje y redireccion
+                    $mensajes=array(
+                        array(
+                            "tipo" => "danger",
+                            "mensaje" => "Hubu un  error al guardar en la base de datos."
+                        )
+                    );
+                    $_SESSION["mensajes"] = $mensajes;
+                    header("Location:".$_SESSION["home"]."panel/usuarios");
+
+                }
+
+            }else{
+                //Actualiza el usuario
+                $consulta = $this->db->exec("UPDATE usuarios SET usuario='$usuario',clave='$clave_encriptada',noticias=$noticias,usuarios=$usuarios WHERE id=$id");
+
+                //Se crea correctamente
+                if ( $consulta > 0) {
+
+                    //Mensaje y redireccion SUCCESS
+                    $mensajes=array(
+                        array(
+                            "tipo" => "success",
+                            "mensaje" => "Usuario: <strong>$usuario</strong> se ha actualizado correctamente."
+                        )
+                    );
+                    $_SESSION["mensajes"] = $mensajes;
+                    header("Location:".$_SESSION["home"]."panel/usuarios");
+
+                    //Hubo algun error
+                }else {
+
+                    //Mensaje y redireccion ERROR
+                    $mensajes=array(
+                        array(
+                            "tipo" => "danger",
+                            "mensaje" => "Hubo un  error al actualizar en la base de datos."
+                        )
+                    );
+                    $_SESSION["mensajes"] = $mensajes;
+                    header("Location:".$_SESSION["home"]."panel/usuarios");
+
+                }
+
+            }
+
+        }
+        else{
+
+            //Obtengo usuario de bbdd
+            $resultado = $this->db->query("SELECT * FROM usuarios WHERE id=".$id);
+            $usuario = $resultado->fetchObject();
+
+            //Llamar a la ventana editar
+            $this->view->vistas("panel","usuarios/editar", $usuario);
+
+        }
+
     }
 
+    //Activa y desactiva segun el estado actual
     //Activa y desactiva segun el estado actual
     public function activar($id){}
 
     public function borrar($id){}
 
-    public function entrar(){}
+    public function entrar(){
 
-    public function salir(){}
+        if ( isset($_SESSION["usuario"])) {
+
+            //Le llevo a la pag de inicio del panel
+            $this->inicio();
+        }
+        else if ( isset($_POST["acceder"]) ) {
+
+            //Recupero datos del formulario, de manera segura
+            $usuario = filter_input(INPUT_POST, "usuario", FILTER_SANITIZE_STRING );
+            $clave = filter_input(INPUT_POST, "clave", FILTER_SANITIZE_STRING );
+
+            //echo "El usuario es $usuario y la clave es $clave";
+
+            //Busco el usuario introducido en la BBDD y lo asigno a un objeto
+            $resultado = $this->db->query("SELECT * FROM usuarios WHERE usuario='".$usuario."' AND activo = 1");
+            $user = $resultado->fetchObject();
+
+            //Mi user es Antonio y 12345678
+
+
+            //SI existe el usuario
+            if ($user) {
+                //echo "El user existe";
+                if (hash_equals($user->clave, crypt($clave, $user->clave))) {
+                    //echo "¡Contraseña verificada!";
+
+                    //Asigno el usuario a la sesion
+                    $_SESSION["usuario"] = $user;
+
+                    //Mensaje de entrada y redireccion
+                    $mensajes=array(
+                        array(
+                            "tipo" => "success",
+                            "mensaje" => "Bienvenido el panel de control."
+                        )
+                    );
+                    $_SESSION["mensajes"] = $mensajes;
+                    header("Location:".$_SESSION["home"]."panel");
+
+                }
+                else{
+                    //echo "MALA PASS";
+                    //Mensaje de error y redireccion
+                    $mensajes=array(
+                        array(
+                            "tipo" => "danger",
+                            "mensaje" => "Clave incorrecta."
+                        )
+                    );
+                    $_SESSION["mensajes"] = $mensajes;
+                    header("Location:".$_SESSION["home"]."panel");
+                }
+            }
+            else {
+                //Mensaje de error y redireccion
+                $mensajes=array(
+                    array(
+                        "tipo" => "danger",
+                        "mensaje" => "No existe ningún usuario con ese nombre."
+                    )
+                );
+                $_SESSION["mensajes"] = $mensajes;
+                header("Location:".$_SESSION["home"]."panel");
+            }
+        }
+        else {
+            //Te llevo a la pagina de acceso, para verificar el usser.
+            $this->view->vistas("panel","usuarios/entrar");
+        }
+
+    }
+
+    public function salir(){
+
+        //Borro al usuario
+        unset($_SESSION["usuario"]);
+        //Mensaje de exito en el cierre de sesión
+        $mensajes=array(
+            array(
+                "tipo" => "success",
+                "mensaje" => "Te has desconectado con exito."
+            )
+        );
+        $_SESSION["mensajes"] = $mensajes;
+        header("Location:".$_SESSION["home"]."panel");
+
+    }
 }
