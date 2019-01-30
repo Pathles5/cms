@@ -57,17 +57,27 @@ Todo esto es mio y lo activo de jairus
                 <!--activar/desactivar-->
                 <?php $clase = ($usuario->activo ==1 ) ? "verde" : "rojo" ?>
                 <?php $icono = ($usuario->activo ==1 ) ? "up" : "down" ?>
-                <a class="<?php echo $clase ?>" href="" title="añadir">
+                <a class="<?php echo $clase ?>" href="<?php echo $_SESSION['home'] ?>panel/usuarios/activar/<?php echo $usuario->id ?>" title="activar/desactivar">
                     <i class="far fa-thumbs-<?php echo $icono ?>"></i>
                 </a>
 
                 <!--Borrar-->
-                <a href="<?php echo $_SESSION['home'] ?>panel/usuarios/borrar/<?php echo $usuario->id ?>" title="añadir">
+                <a class="boton_borrar" data-id="<?php echo $usuario->id ?>" title="añadir">
                     <i class="far fa-trash-alt"></i>
                 </a>
 
             </div>
 
+        </div>
+        <div class="col-12 mensaje_borrar" id="<?php echo $usuario->id ?>">
+            <p>¿Seguro que desea borrar al usuario: <strong><?php echo $usuario->usuario ?></strong>?</p>
+            <p><small>Esta accion no se puede deshacer</small></p>
+            <a href="<?php echo $_SESSION['home'] ?>panel/usuarios/borrar/<?php echo $usuario->id ?>" title="borrar usuario">
+                Borrar
+            </a>
+            <a class="boton_borrar" data-id="<?php echo $usuario->id ?>">
+                Cancelar
+            </a>
         </div>
     <?php } ?>
 

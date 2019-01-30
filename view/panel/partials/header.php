@@ -11,8 +11,7 @@
         <!-- mi CSS -->
         <link rel="stylesheet" type="text/css" href="<?php echo $_SESSION['public'] ?>css/panel.css">
 
-        <!-- JS -->
-        <script type="text/javascript" src="<?php echo $_SESSION['public'] ?>js/app.js"></script>
+
     </head>
 
     <body>

@@ -54,31 +54,49 @@
 
     <form method="post" name="editar" action="<?php echo $_SESSION['home'] ?>panel/usuarios/editar/<?php echo $id ?>">
         <div class="row edicion">
+
             <div class="col-6">
+
                 <strong>
-                    Usuario: <br>
+                    <strong>Usuario:</strong> <br>
                     <input type="text" name="usuario" value="<?php echo $datos->usuario ?>">
                 </strong><br>
 
                 <strong>
-                    Clave: <br>
-                    <input type="text" name="usuario" value="<?php echo $datos->clave ?>">
+
+                    <strong>Clave:</strong> <br>
+
+                    <?php $clase = ($datos->id) ? "" : "d-none" ?>
+                    <label class="<?php echo $clase ?>">
+                        <input type="checkbox" name="cambiar_clave" class="cambiar_clave" > Pincha para cambiar la clave
+                    </label><br>
+
+                    <?php $clase = ($datos->id) ? "" : "d-block" ?>
+                    <input type="password" name="usuario" class="<?php echo $clase ?>" autocomplete="off">
+
                 </strong>
+
             </div>
 
             <div class="col-6">
+
                 <strong>Último acceso: </strong> <br>
+
                 <?php echo ($datos->fecha_acceso) ? date("d/m/Y H:i", strtotime( $datos->fecha_acceso )) : "" ?>
                 <br><br>
+
                 <strong>Permisos:</strong><br>
+
                 <label>
                     <input type="checkbox" name="noticias" <?php echo ($datos->noticias == 1) ? "checked" : "" ?>>
                     Noticias
                 </label><br>
+
                 <label>
                     <input type="checkbox" name="usuarios" <?php echo ($datos->usuarios == 1) ? "checked" : "" ?>>
                     Usuarios
                 </label>
+
             </div>
         </div>
     </form>

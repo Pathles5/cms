@@ -41,4 +41,28 @@ a:hover {
     padding: 0.3em 0 0.3em 0;
     border-bottom: 1px solid #aaaaaa;
 }
-
+.mensaje_borrar{
+    font-size: 1em;
+    text-align: right;
+    padding: 0.3em;
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #856404;
+    border-radius: 5px;
+    display: none;
+}
+.no-gutters>.col-12.mensaje_borrar{
+    padding: 0.3em;
+}
+.mensaje_borrar a,
+.mensaje_borrar a:hover,
+.mensaje_borrar a.boton_borrar,
+.mensaje_borrar a.boton_borrar:hover{
+    color: #856404;
+    text-decoration: underline;
+    padding: 0 0.2em;
+    cursor: pointer;
+}
+input[type=password]{
+    display: none;
+}

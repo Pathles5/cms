@@ -27,6 +27,8 @@ class UsuarioController
 
     //Le llevo a la página de inicio de panel
     public function inicio(){
+        //Permisos
+        $this->view->permisos();
 
         $this->view->vistas("panel","index");
 
@@ -34,6 +36,9 @@ class UsuarioController
 
     //Listado de usuarios
     function index(){
+
+        //Permisos
+        $this->view->permisos("usuarios");
 
         //Recojo los usuarios de la bbdd
         $datos = $this->db->query("SELECT * FROM usuarios");
@@ -43,6 +48,9 @@ class UsuarioController
     }
 
     public function crear(){
+
+        //Permisos
+        $this->view->permisos("usuarios");
 
         //Creo un nuevo usuario vacio
         $usuario = new Usuario();
@@ -54,6 +62,12 @@ class UsuarioController
 
     public function editar($id){
 
+        //Permisos
+        $this->view->permisos("usuarios");
+
+        //Comprueba permisos y redirecciona si fuese necesario
+        $this->view->permisos("usuarios");
+
         if (isset($_POST["usuario"])){
 
             //Recupero datos del formulario, de manera segura
@@ -61,6 +75,9 @@ class UsuarioController
             $clave = filter_input(INPUT_POST, "clave", FILTER_SANITIZE_STRING );
             $noticias = (filter_input(INPUT_POST, "noticias", FILTER_SANITIZE_NUMBER_INT ) == "on") ? 1 : 0;
             $usuarios = (filter_input(INPUT_POST, "usuarios", FILTER_SANITIZE_NUMBER_INT ) == "on") ? 1 : 0;
+            $cambiar_clave = (filter_input(INPUT_POST, "cambiar_clave", FILTER_SANITIZE_STRING ) == "on") ? 1 : 0;
+
+            //Introducir si el usuario es nuevo, obligar a introducir una nueva contraseña y si editas, que sea voluntario
 
             //Encripto la clave
             $clave_encriptada=crypt($clave);
@@ -68,67 +85,31 @@ class UsuarioController
             if ($id == "nuevo") {
 
                 //Creo nuevo user
+
                 $consulta = $this->db->exec("INSERT INTO usuarios (usuario, clave, noticias, usuarios) VALUES ('$usuario','$clave_encriptada','$noticias','$usuarios')");
 
-                //Se crea correctamente
-                if ( $consulta > 0) {
-
+                ( $consulta > 0) ?
+                    //Se crea correctamente
                     //Mensaje y redireccion
-                    $mensajes=array(
-                        array(
-                            "tipo" => "success",
-                            "mensaje" => "Usuario: <strong>$usuario</strong> se ha registrado."
-                        )
-                    );
-                    $_SESSION["mensajes"] = $mensajes;
-                    header("Location:".$_SESSION["home"]."panel/usuarios");
-
+                    $this->view->mensajeYRedireccion("panel/usuarios", "success", "Usuario: <strong>$usuario</strong> se ha registrado.") :
                 //Hubo algun error
-                }else {
-
                     //Mensaje y redireccion
-                    $mensajes=array(
-                        array(
-                            "tipo" => "danger",
-                            "mensaje" => "Hubu un  error al guardar en la base de datos."
-                        )
-                    );
-                    $_SESSION["mensajes"] = $mensajes;
-                    header("Location:".$_SESSION["home"]."panel/usuarios");
+                    $this->view->mensajeYRedireccion("panel/usuarios", "danger", "Hubu un  error al guardar en la base de datos." );
 
-                }
 
             }else{
                 //Actualiza el usuario
                 $consulta = $this->db->exec("UPDATE usuarios SET usuario='$usuario',clave='$clave_encriptada',noticias=$noticias,usuarios=$usuarios WHERE id=$id");
 
                 //Se crea correctamente
-                if ( $consulta > 0) {
-
-                    //Mensaje y redireccion SUCCESS
-                    $mensajes=array(
-                        array(
-                            "tipo" => "success",
-                            "mensaje" => "Usuario: <strong>$usuario</strong> se ha actualizado correctamente."
-                        )
-                    );
-                    $_SESSION["mensajes"] = $mensajes;
-                    header("Location:".$_SESSION["home"]."panel/usuarios");
-
+                ( $consulta > 0) ?
+                    //Se crea correctamente
+                    //Mensaje y redireccion
+                    $this->view->mensajeYRedireccion("panel/usuarios", "success", "Usuario: <strong>$usuario</strong> se ha actualizado.") :
                     //Hubo algun error
-                }else {
+                    //Mensaje y redireccion
+                    $this->view->mensajeYRedireccion("panel/usuarios", "danger", "Hubu un  error al actualizar en la base de datos." );
 
-                    //Mensaje y redireccion ERROR
-                    $mensajes=array(
-                        array(
-                            "tipo" => "danger",
-                            "mensaje" => "Hubo un  error al actualizar en la base de datos."
-                        )
-                    );
-                    $_SESSION["mensajes"] = $mensajes;
-                    header("Location:".$_SESSION["home"]."panel/usuarios");
-
-                }
 
             }
 
@@ -148,9 +129,53 @@ class UsuarioController
 
     //Activa y desactiva segun el estado actual
     //Activa y desactiva segun el estado actual
-    public function activar($id){}
+    public function activar($id){
+        //Permisos
+        $this->view->permisos("usuarios");
 
-    public function borrar($id){}
+        //Obtengo usuario de bbdd para activar/desactivar el estado activo
+        $resultado = $this->db->query("SELECT * FROM usuarios WHERE id=".$id);
+
+
+        if ($resultado) {
+            $usuario = $resultado->fetchObject();
+            if ($usuario->activo == 1) {
+
+                //Desactivo usuario
+                $consulta=$this->db->exec("UPDATE usuarios SET activo = 0 WHERE id='$id'");
+
+                ( $consulta > 0) ?  //Compruebo para ver queno ha habido errores
+
+                    $this->view->mensajeYRedireccion("panel/usuarios", "success", "Usuario: <strong>$usuario->usuario</strong> se ha desactivado.") :
+                    $this->view->mensajeYRedireccion("panel/usuarios", "danger", "Hubu un  error al guardar en la base de datos." );
+
+            }else{
+
+                //Activo usuario
+                $consulta=$this->db->exec("UPDATE usuarios SET activo = 1 WHERE id='$id'");
+
+                ( $consulta > 0) ?  //Compruebo para ver queno ha habido errores
+
+                    $this->view->mensajeYRedireccion("panel/usuarios", "success", "Usuario: <strong>$usuario->usuario</strong> se ha activado.") :
+                    $this->view->mensajeYRedireccion("panel/usuarios", "danger", "Hubu un  error al guardar en la base de datos." );
+
+            }
+        }
+    }
+
+    public function borrar($id){
+        //Permisos
+        $this->view->permisos("usuarios");
+
+        //Borro usuario
+        $consulta=$this->db->exec("DELETE FROM usuarios WHERE id='$id'");
+
+        ( $consulta > 0) ?  //Compruebo para ver queno ha habido errores
+
+            $this->view->mensajeYRedireccion("panel/usuarios", "success", "Usuario: <strong>$usuario->usuario</strong> se ha borrado.") :
+            $this->view->mensajeYRedireccion("panel/usuarios", "danger", "Hubu un  error al guardar en la base de datos." );
+
+    }
 
     public function entrar(){
 
@@ -184,39 +209,23 @@ class UsuarioController
                     $_SESSION["usuario"] = $user;
 
                     //Mensaje de entrada y redireccion
-                    $mensajes=array(
-                        array(
-                            "tipo" => "success",
-                            "mensaje" => "Bienvenido el panel de control."
-                        )
-                    );
-                    $_SESSION["mensajes"] = $mensajes;
-                    header("Location:".$_SESSION["home"]."panel");
+
+                    //Mensaje y redireccion
+                    $this->view->mensajeYRedireccion("panel", "success", "Bienvenido al panel de control." );
 
                 }
                 else{
                     //echo "MALA PASS";
                     //Mensaje de error y redireccion
-                    $mensajes=array(
-                        array(
-                            "tipo" => "danger",
-                            "mensaje" => "Clave incorrecta."
-                        )
-                    );
-                    $_SESSION["mensajes"] = $mensajes;
-                    header("Location:".$_SESSION["home"]."panel");
+
+                    //Mensaje y redireccion
+                    $this->view->mensajeYRedireccion("panel", "danger", "Error al acceder al panel de administraccion." );
                 }
             }
             else {
-                //Mensaje de error y redireccion
-                $mensajes=array(
-                    array(
-                        "tipo" => "danger",
-                        "mensaje" => "No existe ningún usuario con ese nombre."
-                    )
-                );
-                $_SESSION["mensajes"] = $mensajes;
-                header("Location:".$_SESSION["home"]."panel");
+
+                //Mensaje y redireccion
+                $this->view->mensajeYRedireccion("panel", "danger", "No existe ningún usuario con ese nombre." );
             }
         }
         else {
@@ -231,14 +240,7 @@ class UsuarioController
         //Borro al usuario
         unset($_SESSION["usuario"]);
         //Mensaje de exito en el cierre de sesión
-        $mensajes=array(
-            array(
-                "tipo" => "success",
-                "mensaje" => "Te has desconectado con exito."
-            )
-        );
-        $_SESSION["mensajes"] = $mensajes;
-        header("Location:".$_SESSION["home"]."panel");
+        $this->view->mensajeYRedireccion("panel", "success", "Te has desconectado con exito." );
 
     }
 }
